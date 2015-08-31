@@ -1,34 +1,141 @@
-# C++ objects and libs
+# This file is used to ignore files which are generated
+# ----------------------------------------------------------------------------
 
-*.slo
-*.lo
-*.o
+*~
 *.a
-*.la
-*.lai
-*.so
-*.dll
-*.dylib
-
-# Qt-es
-
-/.qmake.cache
-/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
+*.core
 *.moc
-moc_*.cpp
-qrc_*.cpp
-ui_*.h
+*.o
+*.obj
+*.orig
+*.rej
+*.so
+*.tar.gz
+*_pch.h.cpp
+*_resource.rc
+*.qm
+*.ASC
+*.asc
+*.gbt
+.#*
+*.*#
+core
+!core/
+tags
+.DS_Store
+*.debug
 Makefile*
-*-build-*
+*.prl
+*.app
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Thumbs.db
+build.xml
+default.properties
+local.properties
+proguard.cfg
+*.dll
+*.exe
+*.asc
+*.asc*
+*.dbf
+*.shp
+*.shx
 
-# QtCreator
 
-*.autosave
 
-#QtCtreator Qml
-*.qmlproject.user
-*.qmlproject.user.*
+# qtcreator generated files
+*.pro.user*
+*.pluginspec
+*.directory
+src/app/Info.plist
+src/plugins/coreplugin/ide_version.h
+share/qtcreator/externaltools
+
+# xemacs temporary files
+*.flc
+
+# Vim temporary files
+.*.swp
+
+# Visual Studio generated files
+*.ib_pdb_index
+*.idb
+*.ilk
+*.pdb
+*.sln
+*.suo
+*.vcproj
+*vcproj.*.*.user
+*.ncb
+
+# MinGW generated files
+*.Debug
+*.Release
+
+# translation related:
+share/qtcreator/translations/*_tr.h
+share/qtcreator/translations/qtcreator_untranslated.ts
+
+# Directories to ignore
+# ---------------------
+
+
+build
+debug
+release
+old_forms
+lib/*
+lib64/*
+doc/html/*
+doc/api/html/*
+doc/pluginhowto/html/*
+.rcc
+.pch
+
+# Binaries
+# --------
+goblet-classifydataset
+goblet-createdb
+goblet-gendatasetstats
+goblet-importdataset
+goblet-importshape
+goblet-resetdataset
+goblet-aggregatedataset
+goblet-outputraster
+goblet-combinedatasets
+goblet-genaggregatestats
+goblet-classifyaggregate
+goblet-resetaggregate
+goblet-combineaggregate
+goblet-outputshape
+goblet-describeshape
+goblet-datasetcalc
+goblet-listdatasets
+goblet-modifydataset
+goblet-calcincombination
+goblet-calcinshape
+goblet-removedataset
+goblet-executesql
+goblet-aggregatetoshape
+goblet-extractmetadata
+
+
+README
+dbfadd
+dbfcreate
+dbfdump
+shpadd
+shpcreate
+shpdump
+shprewind
+shptest
+shptreedump
+shp2mysql
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+obj\Release\ResolveAssemblyReference.cache
+obj\Release\Interop.MapWinGIS.dll
+obj\Release\ShapefileToGrid.csproj.ResolveComReference.cache
+obj\Release\ShapefileToGrid.Resources.shp2grid6.ico
+obj\Release\jk.ShapefileToGrid.frmGrid.resources
+obj\Release\jk.ShapefileToGrid.frmProgress.resources
+obj\Release\jk.ShapefileToGrid.frmShapefile.resources
+obj\Release\ShapefileToGrid.Properties.Resources.resources
+obj\Release\ShapefileToGrid.Resource.resources
+obj\Release\ShapefileToGrid.csproj.GenerateResource.Cache
+C:\dev\MapWindow\MapWindow4Dev\Bin\Plugins\ShapefileToGrid.dll
+C:\dev\MapWindow\MapWindow4Dev\Bin\Plugins\ShapefileToGrid.pdb
+obj\Release\ShapefileToGrid.dll
+obj\Release\ShapefileToGrid.pdb
