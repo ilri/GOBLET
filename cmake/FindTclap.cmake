@@ -2,9 +2,8 @@
 
 
 FIND_PATH(TCLAP_INCLUDEDIR "tclap/CmdLine.h"
-  /usr/local/include/tclap
-  /usr/include/tclap
-  /home/cquiros/data/projects/RMG/software/GOBLET/tools/3rdParty
+  /usr/include
+  /usr/local/include
 )
 IF(TCLAP_INCLUDEDIR)
   SET(TCLAP_FOUND TRUE)

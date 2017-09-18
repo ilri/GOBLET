@@ -182,10 +182,8 @@ public:
     void setPassword(QString password);
 private:
     QString m_tableName;
-    QString m_path;
     QString m_dataBase;
     //For remote
-    bool m_remote;
     QString m_host;
     int m_port;
     QString m_user;

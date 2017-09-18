@@ -20,19 +20,15 @@ public:
     uploadCSV(QObject *parent = 0);
     void run();
     void setTableName(QString tableName);
-    void setPath(QString path);
     void setDataBase(QString name);
-    void setRemote(bool remote);
     void setHost(QString host);
     void setPort(int port);
     void setUser(QString user);
     void setPassword(QString password);
 private:
     QString m_tableName;
-    QString m_path;
     QString m_dataBase;
     //For remote
-    bool m_remote;
     QString m_host;
     int m_port;
     QString m_user;

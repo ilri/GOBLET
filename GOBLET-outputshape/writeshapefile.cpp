@@ -4,10 +4,16 @@
 #include <QSqlError>
 #include <QFile>
 #include <QVariant>
-#include "mydbconn.h"
 #include <stdlib.h>
 #include <string.h>
 #include <QStringList>
+
+void gbtLog2(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 writeShapefile::writeShapefile(QObject *parent) :
     QObject(parent)
@@ -286,7 +292,7 @@ bool writeShapefile::createShapeFile()
     {
         if (!m_overWrite)
         {
-            gbtLog("Shape output file already exists. To overwrite use -O");
+            gbtLog2("Shape output file already exists. To overwrite use -O");
             return false;
         }
         else
@@ -332,29 +338,29 @@ bool writeShapefile::createShapeFile()
         }
         else
         {
-            gbtLog("Error selecting dataset");
-            gbtLog(query.lastError().databaseText());
+            gbtLog2("Error selecting dataset");
+            gbtLog2(query.lastError().databaseText());
             return false;
         }
     }
     else
     {
-        gbtLog("Error selecting dataset");
-        gbtLog(query.lastError().databaseText());
+        gbtLog2("Error selecting dataset");
+        gbtLog2(query.lastError().databaseText());
         return false;
     }
 
 
     if (nShapeType < 0 || nShapeType > 31)
     {
-        gbtLog("Shaoe type error");
+        gbtLog2("Shaoe type error");
         return false;
     }
 
     hSHP = SHPCreate( pshapeFile, nShapeType );
     if( hSHP == NULL )
     {
-        gbtLog("Unable to create: " + m_shapeFile);
+        gbtLog2("Unable to create: " + m_shapeFile);
         return false;
     }
 
@@ -364,7 +370,7 @@ bool writeShapefile::createShapeFile()
     hDBF = DBFCreate(pdbfFile);
     if( hDBF == NULL )
     {
-        gbtLog("Unable to create dbf: " + dbfFile);
+        gbtLog2("Unable to create dbf: " + dbfFile);
         SHPClose( hSHP );
         return false;
     }
@@ -433,7 +439,7 @@ bool writeShapefile::createShapeFile()
 
         if( DBFAddField( hDBF, fieldName.toLocal8Bit().data(), eType, size, prec ) == -1 )
         {
-            gbtLog("Unable to create dbf: " + dbfFile);
+            gbtLog2("Unable to create dbf: " + dbfFile);
             DBFClose(hDBF);
             SHPClose(hSHP);
             return false;
@@ -460,7 +466,7 @@ bool writeShapefile::createShapeFile()
 
         if( DBFAddField( hDBF, "classCode", FTInteger, 10, 0 ) == -1 )
         {
-            gbtLog("Unable to create dbf: " + dbfFile);
+            gbtLog2("Unable to create dbf: " + dbfFile);
             DBFClose(hDBF);
             SHPClose(hSHP);
             return false;
@@ -476,7 +482,7 @@ bool writeShapefile::createShapeFile()
 
         if( DBFAddField( hDBF, "comCode", FTInteger, 10, 0 ) == -1 )
         {
-            gbtLog("Unable to create dbf: " + dbfFile);
+            gbtLog2("Unable to create dbf: " + dbfFile);
             DBFClose(hDBF);
             SHPClose(hSHP);
             return false;
@@ -520,8 +526,8 @@ bool writeShapefile::createShapeFile()
     }
     else
     {
-        gbtLog("Error while loading data");
-        gbtLog(query.lastError().databaseText());
+        gbtLog2("Error while loading data");
+        gbtLog2(query.lastError().databaseText());
     }
 
     //Closes the DBF and SHP handles.

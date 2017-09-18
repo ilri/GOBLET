@@ -1,20 +1,20 @@
-/*
+ï»¿/*
   -------------Code heavely based on shp2Mysql----------------------------------
 
  BJK =  quick and dirty  hack to make it work for MySQL alpha 4.1
-  Barend Köbben <kobben@itc.nl>
+  Barend Kobben <kobben@itc.nl>
   WARNING: NO TESTING DONE TO SPEAK OFF !!!
  version 0.2 - november 2003
                 port from PostGIS SQL to MySQL
  version 0.3 - may 2004
-                changed all coordinate output to fixed decimal places as JTS does not accept 1234e-xxx notation
+
  version 0.4 - July 2004
+                changed all coordinate output to fixed decimal places as JTS does not accept 1234e-xxx notation
                 changed primary from being called gid to ID
                 fixed a bug where Add geometry statement was not endend properly with ";"
 
 
  released under GPL, http:www.gnu.orgcopyleftgpl.html
-
   ORIGINAL:
 
   $Id: shp2pgsql.c,v 1.33 20030401 23:02:50 jeffloun Exp $
@@ -61,7 +61,13 @@
 #include <stdlib.h>
 #include <QFile>
 #include <QTextStream>
-#include "mydbconn.h"
+
+void gbtLog3(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 insertShape::insertShape(QObject *parent) :
     QObject(parent)
@@ -578,7 +584,7 @@ int insertShape::loadShape()
     hDBFHandle = DBFOpen( shp_file, "rb" );
     if (hSHPHandle == NULL || hDBFHandle == NULL)
     {
-        gbtLog("shape is null\n");
+        gbtLog3("shape is null\n");
         return -1;
     }
 
@@ -663,7 +669,7 @@ int insertShape::loadShape()
             }
             else
             {
-                gbtLog("Unknown field type: using varchar(255)");
+                gbtLog3("Unknown field type: using varchar(255)");
                 //printf ("VARCHAR(255)");
                 appendString("VARCHAR(255)");
             }
@@ -681,7 +687,7 @@ int insertShape::loadShape()
         obj = 	SHPReadObject(hSHPHandle,0);
         if(obj == NULL)
         {
-            gbtLog("file exists but contains null shapes");
+            gbtLog3("file exists but contains null shapes");
             exit(-1);
         }
     }
@@ -1137,7 +1143,7 @@ int insertShape::loadShape()
         }
         else
         {
-            gbtLog("**** Type is NOT SUPPORTED, type id = " + QString::number(obj->nSHPType) + "****");
+            gbtLog3("**** Type is NOT SUPPORTED, type id = " + QString::number(obj->nSHPType) + "****");
             //print out what type the file is and that it is not supported
 
         }//end the if statement for shape types

@@ -1,5 +1,4 @@
 #include <QObject>
-#include "mydbconn.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -12,6 +11,14 @@
 #include <QCoreApplication>
 #include <cmath>
 #include <QTextStream>
+#include <QVector>
+
+void gbtLog(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 QString getStrValue(int value)
 {
@@ -31,22 +38,22 @@ QString getStrValue(int value)
 QString getWhereClauseFromExtent2(QString extent,QSqlDatabase db, QPointF &UL, QPointF &LR, double &dbCellSize)
 {
     //(1.3333,32.1212321) (-4.12121,41.212121)
-    if (!extent.count(" ") == 1)
+    if (extent.count(" ") != 1)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count(",") == 2)
+    if (extent.count(",") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count("(") == 2)
+    if (extent.count("(") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count(")") == 2)
+    if (extent.count(")") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
@@ -171,22 +178,22 @@ QString getWhereClauseFromExtent2(QString extent,QSqlDatabase db, QPointF &UL, Q
 QString getWhereClauseFromExtent(QString extent,QSqlDatabase db, QString table, QPointF &UL, QPointF &LR, double &dbCellSize)
 {
     //(1.3333,32.1212321) (-4.12121,41.212121)
-    if (!extent.count(" ") == 1)
+    if (extent.count(" ") != 1)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count(",") == 2)
+    if (extent.count(",") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count("(") == 2)
+    if (extent.count("(") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
     }
-    if (!extent.count(")") == 2)
+    if (extent.count(")") != 2)
     {
         gbtLog(QObject::tr("Extent is invalid"));
         return QString();
@@ -662,22 +669,19 @@ int main(int argc, char *argv[])
     TCLAP::ValueArg<std::string> datasetTypeArg("i","inputDatasetType","Input Dataset type: (g)rid, (c)lassification, com(b)ination",true,"","string");
     TCLAP::ValueArg<std::string> outputFileArg("o","outputFile","output ascii grid file name",true,"","string");
     //Non required arguments
-    TCLAP::ValueArg<std::string> pathArg("a","path","Path to database. Default .",false,".","string");
-    TCLAP::ValueArg<std::string> hostArg("H","host","Connect to host. Default localhost",false,"localhost","string");
+    TCLAP::ValueArg<std::string> hostArg("H","host","Connect to host. Default localhost",true,"localhost","string");
     TCLAP::ValueArg<std::string> portArg("P","port","Port number to use. Default 3306",false,"3306","string");
-    TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",false,"","string");
-    TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",false,"","string");
+    TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",true,"","string");
+    TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",true,"","string");
     TCLAP::ValueArg<std::string> extentArg("e","extent","Extent: '(upperLeft degrees lat,log) (lowerRight degrees lat,log)'",false,"","string");
     TCLAP::ValueArg<std::string> shpConstraintArg("S","constraintbyshapes","Constraint output using a shapefile and shapes: ShapeDataSet:shapeID,ShapeID,....",false,"","string");
     TCLAP::ValueArg<std::string> classesArg("c","combinationtoshow","Combination/classification to show: 'Combination/Class Code,Combination/Class Code,....'",false,"","string");
 
-    //Switches
-    TCLAP::SwitchArg remoteSwitch("r","remote","Connect to remote host", cmd, false);
+
     cmd.add(databaseArg);
     cmd.add(datasetArg);
     cmd.add(datasetTypeArg);
     cmd.add(outputFileArg);
-    cmd.add(pathArg);
     cmd.add(hostArg);
     cmd.add(portArg);
     cmd.add(userArg);
@@ -690,8 +694,6 @@ int main(int argc, char *argv[])
     cmd.parse( argc, argv );
 
     //Getting the variables from the command
-    bool remote = remoteSwitch.getValue();
-    QString path = QString::fromUtf8(pathArg.getValue().c_str());
     QString dbName = QString::fromUtf8(databaseArg.getValue().c_str());
     QString host = QString::fromUtf8(hostArg.getValue().c_str());
     QString port = QString::fromUtf8(portArg.getValue().c_str());
@@ -704,40 +706,24 @@ int main(int argc, char *argv[])
     QString outputFile = QString::fromUtf8(outputFileArg.getValue().c_str());
     QString classestoShow = QString::fromUtf8(classesArg.getValue().c_str());
 
-    myDBConn con;
+
     QSqlDatabase mydb;
-    if (!remote)
-    {
-        QDir dir;
-        dir.setPath(path);
-        if (con.connectToDB(dir.absolutePath()) == 1)
-        {
-            if (!dir.cd(dbName))
-            {
-                gbtLog(QObject::tr("The database does not exists"));
-                con.closeConnection();
-                return 1;
-            }
-            mydb = QSqlDatabase::addDatabase(con.getDriver(),"connection1");
-        }
-    }
-    else
-    {
-        mydb = QSqlDatabase::addDatabase("QMYSQL","connection1");
-        mydb.setHostName(host);
-        mydb.setPort(port.toInt());
-        if (!userName.isEmpty())
-            mydb.setUserName(userName);
-        if (!password.isEmpty())
-            mydb.setPassword(password);
-    }
+
+    mydb = QSqlDatabase::addDatabase("QMYSQL","connection1");
+    mydb.setHostName(host);
+    mydb.setPort(port.toInt());
+    if (!userName.isEmpty())
+        mydb.setUserName(userName);
+    if (!password.isEmpty())
+        mydb.setPassword(password);
+
 
     mydb.setDatabaseName(dbName);
 
     if (!mydb.open())
     {
         gbtLog(QObject::tr("Cannot open database"));
-        con.closeConnection();
+
         return 1;
     }
     else
@@ -888,7 +874,7 @@ int main(int argc, char *argv[])
                 {
                     gbtLog(QObject::tr("To rasterize a combination you need an extent or constrainig shapes"));
                     mydb.close();
-                    con.closeConnection();
+
                     return 1;
                 }
                 calcExtendFromGrid(tableName,mydb,upperLeft,lowerRight,dbCellSize);
@@ -951,7 +937,7 @@ int main(int argc, char *argv[])
                 {
                     gbtLog(QObject::tr("Dataset type not valid"));
                     mydb.close();
-                    con.closeConnection();
+
                     return 1;
                 }
             }
@@ -1045,7 +1031,7 @@ int main(int argc, char *argv[])
             gbtLog(QObject::tr("Cannot read dataset"));
             gbtLog(qry.lastError().databaseText());
             mydb.close();
-            con.closeConnection();
+
             return 1;
         }
 
@@ -1063,7 +1049,7 @@ int main(int argc, char *argv[])
         gbtLog("Finished in " + QString::number(Hours) + " Hours," + QString::number(Minutes) + " Minutes and " + QString::number(Seconds) + " Seconds.");
 
         mydb.close();
-        con.closeConnection();
+
 
         return 0;
     }
