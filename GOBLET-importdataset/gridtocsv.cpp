@@ -9,8 +9,13 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QSqlError>
-#include "mydbconn.h"
 
+void gbtLog2(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 QMutex listMutex;
 QList<fileData> listFiles;
@@ -33,7 +38,7 @@ void addToList(QString file, long percentage)
 uploadCSV::uploadCSV(QObject *parent) :
     QThread(parent)
 {
-    m_remote = false;
+
 }
 
 void uploadCSV::setTableName(QString tableName)
@@ -41,19 +46,10 @@ void uploadCSV::setTableName(QString tableName)
     m_tableName = tableName;
 }
 
-void uploadCSV::setPath(QString path)
-{
-    m_path = path;
-}
 
 void uploadCSV::setDataBase(QString name)
 {
     m_dataBase = name;
-}
-
-void uploadCSV::setRemote(bool remote)
-{
-    m_remote = remote;
 }
 
 void uploadCSV::setHost(QString host)
@@ -78,19 +74,9 @@ void uploadCSV::setPassword(QString password)
 
 void uploadCSV::run()
 {
-    myDBConn con;
+
     QSqlDatabase mydb;
-    if (!m_remote)
-    {
-        if (con.connectToDB(m_path) == 1)
-        {
-            mydb = QSqlDatabase::addDatabase(con.getDriver(),"connection2"); //Add the database connector to MySQL
-        }
-        else
-            return;
-    }
-    else
-    {
+
         mydb = QSqlDatabase::addDatabase("QMYSQL","connection2");
         mydb.setHostName(m_host);
         mydb.setPort(m_port);
@@ -98,7 +84,7 @@ void uploadCSV::run()
            mydb.setUserName(m_user);
         if (!m_password.isEmpty())
            mydb.setPassword(m_password);
-    }
+
 
     mydb.setDatabaseName(m_dataBase);
     if (mydb.open())
@@ -138,8 +124,8 @@ void uploadCSV::run()
                 listMutex.unlock();
                 if (!qry.exec(sql))
                 {
-                    gbtLog(tr("Error uploading table: ") + m_tableName);
-                    gbtLog(qry.lastError().databaseText());
+                    gbtLog2(tr("Error uploading table: ") + m_tableName);
+                    gbtLog2(qry.lastError().databaseText());
                 }
                 //printf("\r%i %% inserted", perc); //Wierd.. this stop working!!!
                 printf("%i %% inserted \n",perc);
@@ -338,7 +324,7 @@ void gridToCSV::run()
                                     ofile.setFileName(oFileName);
                                     if (!ofile.open(QIODevice::WriteOnly | QIODevice::Text))
                                     {
-                                        gbtLog(tr("Error opening part file"));
+                                        gbtLog2(tr("Error opening part file"));
                                         error = true;
                                         return;
                                     }
@@ -346,7 +332,7 @@ void gridToCSV::run()
 
                                 }
                                 out << outString << "\n";
-                                lineSize = lineSize + outString.toAscii().size();
+                                lineSize = lineSize + outString.toLatin1().size();
                                 if (lineSize > maxOutSize)
                                 {
                                     ofile.setPermissions( QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther );

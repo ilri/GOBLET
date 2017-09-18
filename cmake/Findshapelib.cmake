@@ -4,14 +4,12 @@
 FIND_PATH(SHAPELIB_INCLUDE_DIR shapefil.h
   /usr/local/include
   /usr/include
-  /home/cquiros/data/projects/RMG/software/GOBLET/tools/3rdParty/shapelib
-  ~/data/projects/ILRI-MARIO/software/GOBLET/tools/3rdParty/shapelib
 )
 
-SET(SHAPELIB_NAMES shp)
+SET(SHAPELIB_NAMES libshp.a)
 FIND_LIBRARY(SHAPELIB_LIBRARY
   NAMES ${SHAPELIB_NAMES}
-  PATHS /usr/lib /usr/local/lib /usr/lib64 /home/cquiros/data/projects/RMG/software/GOBLET/tools/3rdParty/shapelib ~/data/projects/ILRI-MARIO/software/GOBLET/tools/3rdParty/shapelib
+  PATHS /usr/lib /usr/local/lib /usr/lib64 
 )
 
 IF (SHAPELIB_LIBRARY)          

@@ -4,11 +4,18 @@
 #include <QDir>
 #include <QSqlQuery>
 #include <QSqlError>
-#include "mydbconn.h"
+
 
 QMutex listMutex;
 QList<fileData> listFiles;
 bool gridToCSVStarted;
+
+void gbtLog2(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 void addToList(QString file, long percentage)
 {
@@ -25,7 +32,7 @@ void addToList(QString file, long percentage)
 uploadCSV::uploadCSV(QObject *parent) :
     QThread(parent)
 {
-    m_remote = false;
+
 }
 
 void uploadCSV::setTableName(QString tableName)
@@ -33,20 +40,12 @@ void uploadCSV::setTableName(QString tableName)
     m_tableName = tableName;
 }
 
-void uploadCSV::setPath(QString path)
-{
-    m_path = path;
-}
 
 void uploadCSV::setDataBase(QString name)
 {
     m_dataBase = name;
 }
 
-void uploadCSV::setRemote(bool remote)
-{
-    m_remote = remote;
-}
 
 void uploadCSV::setHost(QString host)
 {
@@ -70,19 +69,8 @@ void uploadCSV::setPassword(QString password)
 
 void uploadCSV::run()
 {
-    myDBConn con;
     QSqlDatabase mydb;
-    if (!m_remote)
-    {
-        if (con.connectToDB(m_path) == 1)
-        {
-            mydb = QSqlDatabase::addDatabase(con.getDriver(),"connection2"); //Add the database connector to MySQL
-        }
-        else
-            return;
-    }
-    else
-    {
+
         mydb = QSqlDatabase::addDatabase("QMYSQL","connection2");
         mydb.setHostName(m_host);
         mydb.setPort(m_port);
@@ -90,7 +78,7 @@ void uploadCSV::run()
            mydb.setUserName(m_user);
         if (!m_password.isEmpty())
            mydb.setPassword(m_password);
-    }
+
 
     mydb.setDatabaseName(m_dataBase);
     if (mydb.open())
@@ -132,8 +120,8 @@ void uploadCSV::run()
 
                 if (!qry.exec(sql))
                 {
-                    gbtLog(tr("Error uploading table: ") + m_tableName);
-                    gbtLog(qry.lastError().databaseText());
+                    gbtLog2(tr("Error uploading table: ") + m_tableName);
+                    gbtLog2(qry.lastError().databaseText());
                 }
                 //printf("\r%i %% inserted", perc); //Wierd... this stop working...
                 printf("%i %% inserted \n",perc);
@@ -204,7 +192,7 @@ bool shapeFile::open(QString fileName)
 
     if( hSHP == NULL )
     {
-        gbtLog(tr("Unable to open: ") + fileName);
+        gbtLog2(tr("Unable to open: ") + fileName);
         return 0;
     }
     SHPGetInfo( hSHP, &nEntities, &nShapeType, adfMinBound, adfMaxBound );
@@ -230,7 +218,7 @@ bool shapeFile::open(QString fileName)
 
         if( psShape == NULL )
         {
-            gbtLog("Unable to read shape " + QString::number(i) + ". Terminating object reading.\n");
+            gbtLog2("Unable to read shape " + QString::number(i) + ". Terminating object reading.\n");
             break;
         }
 
@@ -271,7 +259,7 @@ bool shapeFile::open(QString fileName)
 
         if( psShape->nParts > 0 && psShape->panPartStart[0] != 0 )
         {
-            gbtLog("panPartStart[0] = " + QString::number(psShape->panPartStart[0]) + " not zero as expected.\n");
+            gbtLog2("panPartStart[0] = " + QString::number(psShape->panPartStart[0]) + " not zero as expected.\n");
         }
 
         for( j = 0, iPart = 1; j < psShape->nVertices; j++ )
@@ -560,14 +548,14 @@ void Rasterizer::PixListToCSV(TGridHeader GrdHd)
           ofile.setFileName(oFileName);
           if (!ofile.open(QIODevice::WriteOnly | QIODevice::Text))
           {
-              gbtLog(tr("Error opening part file"));
+              gbtLog2(tr("Error opening part file"));
               return;
           }
           out.setDevice(&ofile);
 
       }
       out << outString << "\n";
-      lineSize = lineSize + outString.toAscii().size();
+      lineSize = lineSize + outString.toLatin1().size();
       if (lineSize > maxOutSize)
       {
           ofile.setPermissions( QFile::ReadOwner | QFile::WriteOwner | QFile::ReadGroup | QFile::ReadOther );
@@ -630,7 +618,7 @@ bool Rasterizer::ShapeFileToGrid(QString SfNm, TGridHeader GrdHd)
     flg = MySf.open(SfNm);
     if(  flg == false )
     {
-        gbtLog(tr("Error opening shapefile: ") + SfNm);
+        gbtLog2(tr("Error opening shapefile: ") + SfNm);
         result = false;
     }
 

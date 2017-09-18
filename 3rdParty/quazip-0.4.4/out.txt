@@ -1,7 +1,0 @@
-cd quazip\ && mingw32-make -f Makefile 
-mingw32-make[1]: Entering directory `C:/ilri/GOBLET/tools/3rdParty/quazip-0.4.4/quazip'
-mingw32-make -f Makefile.Debug
-mingw32-make[2]: Entering directory `C:/ilri/GOBLET/tools/3rdParty/quazip-0.4.4/quazip'
-gcc -c -g -Wall -DUNICODE -DQT_LARGEFILE_SUPPORT -DQUAZIP_BUILD -DQT_DLL -DQT_CORE_LIB -DQT_THREAD_SUPPORT -I"c:\Qt\2010.03\qt\include\QtCore" -I"c:\Qt\2010.03\qt\include" -I"..\zlib-1.2.5" -I"." -I"c:\Qt\2010.03\qt\include\ActiveQt" -I"debug" -I"c:\Qt\2010.03\qt\mkspecs\default" -o debug\unzip.o unzip.c
-mingw32-make[2]: Leaving directory `C:/ilri/GOBLET/tools/3rdParty/quazip-0.4.4/quazip'
-mingw32-make[1]: Leaving directory `C:/ilri/GOBLET/tools/3rdParty/quazip-0.4.4/quazip'

@@ -1,5 +1,5 @@
 #include <QObject>
-#include "mydbconn.h"
+
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -7,6 +7,14 @@
 #include <QTime>
 #include <tclap/CmdLine.h>
 #include <QCoreApplication>
+#include <QVariant>
+
+void gbtLog(QString message)
+{
+    QString temp;
+    temp = message + "\n";
+    printf(temp.toLocal8Bit().data());
+}
 
 bool createShape(QString outputType, QStringList datasets, QSqlDatabase db, QString shape, QString targetShape, QString description, QString function)
 {
@@ -252,11 +260,10 @@ int main(int argc, char *argv[])
     TCLAP::ValueArg<std::string> targetshapeArg("e","targetshapefile","The name of the target shapefile",true,"","string");
 
     //Non required arguments
-    TCLAP::ValueArg<std::string> pathArg("a","path","Path to database. Default .",false,".","string");
-    TCLAP::ValueArg<std::string> hostArg("H","host","Connect to host. Default localhost",false,"localhost","string");
+    TCLAP::ValueArg<std::string> hostArg("H","host","Connect to host. Default localhost",true,"localhost","string");
     TCLAP::ValueArg<std::string> portArg("P","port","Port number to use. Default 3306",false,"3306","string");
-    TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",false,"","string");
-    TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",false,"","string");
+    TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",true,"","string");
+    TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",true,"","string");
     TCLAP::ValueArg<std::string> datasetArg("t","datasets","The aggregated datasets separated by coma. Default: All aggregated datasets",false,"all","string");
     TCLAP::ValueArg<std::string> outputArg("O","outputtype","Output type: aggregated (v)value (default), (c)lass code, com(b)ination code, (g)grouped value per shape",false,"v","string");
     TCLAP::ValueArg<std::string> descArg("s","description","Description of target shape",false,"Result of aggregate","string");
@@ -264,7 +271,6 @@ int main(int argc, char *argv[])
 
 
     //Switches
-    TCLAP::SwitchArg remoteSwitch("r","remote","Connect to remote host", cmd, false);
     TCLAP::SwitchArg overwriteSwitch("o","overwrite","Overwrite the currect shape", cmd, false);
 
 
@@ -273,7 +279,6 @@ int main(int argc, char *argv[])
     cmd.add(outputArg);
     cmd.add(shapeArg);
     cmd.add(targetshapeArg);
-    cmd.add(pathArg);
     cmd.add(hostArg);
     cmd.add(portArg);
     cmd.add(userArg);
@@ -285,8 +290,6 @@ int main(int argc, char *argv[])
     cmd.parse( argc, argv );
 
     //Getting the variables from the command
-    bool remote = remoteSwitch.getValue();
-    QString path = QString::fromUtf8(pathArg.getValue().c_str());
     QString dbName = QString::fromUtf8(databaseArg.getValue().c_str());
     QString host = QString::fromUtf8(hostArg.getValue().c_str());
     QString port = QString::fromUtf8(portArg.getValue().c_str());
@@ -300,40 +303,23 @@ int main(int argc, char *argv[])
     QString description = QString::fromUtf8(descArg.getValue().c_str());
     QString function = QString::fromUtf8(functionrg.getValue().c_str());
 
-    myDBConn con;
+
     QSqlDatabase mydb;
-    if (!remote)
-    {
-        QDir dir;
-        dir.setPath(path);
-        if (con.connectToDB(dir.absolutePath()) == 1)
-        {
-            if (!dir.cd(dbName))
-            {
-                gbtLog(QObject::tr("The database does not exists"));
-                con.closeConnection();
-                return 1;
-            }
-            mydb = QSqlDatabase::addDatabase(con.getDriver(),"connection1");
-        }
-    }
-    else
-    {
-        mydb = QSqlDatabase::addDatabase("QMYSQL","connection1");
-        mydb.setHostName(host);
-        mydb.setPort(port.toInt());
-        if (!userName.isEmpty())
-           mydb.setUserName(userName);
-        if (!password.isEmpty())
-           mydb.setPassword(password);
-    }
+
+    mydb = QSqlDatabase::addDatabase("QMYSQL","connection1");
+    mydb.setHostName(host);
+    mydb.setPort(port.toInt());
+    if (!userName.isEmpty())
+        mydb.setUserName(userName);
+    if (!password.isEmpty())
+        mydb.setPassword(password);
 
     mydb.setDatabaseName(dbName);
 
     if (!mydb.open())
     {
         gbtLog(QObject::tr("Cannot open database"));
-        con.closeConnection();
+
         return 1;
     }
     else
@@ -352,7 +338,7 @@ int main(int argc, char *argv[])
             {
                 gbtLog(QObject::tr("The target datasets already exists."));
                 mydb.close();
-                con.closeConnection();
+
                 return 1;
             }
         }
@@ -361,7 +347,7 @@ int main(int argc, char *argv[])
             gbtLog(QObject::tr("Cannot convert aggregate."));
             gbtLog(qry.lastError().databaseText());
             mydb.close();
-            con.closeConnection();
+
             return 1;
         }
 
@@ -381,7 +367,7 @@ int main(int argc, char *argv[])
                         {
                             gbtLog(QObject::tr("One of the datasets does not exists."));
                             mydb.close();
-                            con.closeConnection();
+
                             return 1;
                         }
                     }
@@ -395,7 +381,7 @@ int main(int argc, char *argv[])
                         {
                             gbtLog(QObject::tr("Unable to create shapefile from aggregate"));
                             mydb.close();
-                            con.closeConnection();
+
                             return 1;
                         }
                     }
@@ -403,7 +389,7 @@ int main(int argc, char *argv[])
                     {
                         gbtLog(QObject::tr("There are no aggregated datasets to convert"));
                         mydb.close();
-                        con.closeConnection();
+
                         return 1;
                     }
                 }
@@ -411,7 +397,7 @@ int main(int argc, char *argv[])
                 {
                     gbtLog(QObject::tr("The aggregate does not exits."));
                     mydb.close();
-                    con.closeConnection();
+
                     return 1;
                 }
             }
@@ -420,7 +406,7 @@ int main(int argc, char *argv[])
                 gbtLog(QObject::tr("Cannot convert aggregate."));
                 gbtLog(qry.lastError().databaseText());
                 mydb.close();
-                con.closeConnection();
+
                 return 1;
             }
         }
@@ -439,7 +425,7 @@ int main(int argc, char *argv[])
                 {
                     gbtLog(QObject::tr("The aggregate does not exits."));
                     mydb.close();
-                    con.closeConnection();
+
                     return 1;
                 }
             }
@@ -448,7 +434,7 @@ int main(int argc, char *argv[])
                 gbtLog(QObject::tr("Cannot convert aggregate."));
                 gbtLog(qry.lastError().databaseText());
                 mydb.close();
-                con.closeConnection();
+
                 return 1;
             }
         }
@@ -467,7 +453,7 @@ int main(int argc, char *argv[])
         gbtLog("Finished in " + QString::number(Hours) + " Hours," + QString::number(Minutes) + " Minutes and " + QString::number(Seconds) + " Seconds.");
 
         mydb.close();
-        con.closeConnection();
+
 
         return 0;
     }

@@ -42,6 +42,7 @@ proguard.cfg
 *.dbf
 *.shp
 *.shx
+.qmake.stash
 
 
 
