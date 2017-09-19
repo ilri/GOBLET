@@ -38,7 +38,7 @@ void addToList(QString file, long percentage)
 uploadCSV::uploadCSV(QObject *parent) :
     QThread(parent)
 {
-
+    m_NODATA_value = -999;
 }
 
 void uploadCSV::setTableName(QString tableName)
@@ -46,6 +46,10 @@ void uploadCSV::setTableName(QString tableName)
     m_tableName = tableName;
 }
 
+void uploadCSV::setNonDataValue(double value)
+{
+    m_NODATA_value = value;
+}
 
 void uploadCSV::setDataBase(QString name)
 {
@@ -182,6 +186,11 @@ QString gridToCSV::getStrValue(int value)
     svalue = "0" + svalue;
   }
   return svalue;
+}
+
+void gridToCSV::setNonDataValue(double value)
+{
+    NODATA_value = value;
 }
 
 void gridToCSV::run()

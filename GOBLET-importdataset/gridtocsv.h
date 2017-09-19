@@ -25,6 +25,7 @@ public:
     void setPort(int port);
     void setUser(QString user);
     void setPassword(QString password);
+    void setNonDataValue(double value);
 private:
     QString m_tableName;
     QString m_dataBase;
@@ -33,6 +34,7 @@ private:
     int m_port;
     QString m_user;
     QString m_password;
+    double m_NODATA_value;
 };
 
 class gridToCSV : public QThread
@@ -47,6 +49,7 @@ public:
     double getYllCenter(){return yllcorner;}
     int getNCols(){return ncols;}
     int getNRows(){return nrows;}
+    void setNonDataValue(double value);
 private:
     bool m_abort;
     QMutex mutex;

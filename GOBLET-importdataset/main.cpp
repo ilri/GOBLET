@@ -144,6 +144,7 @@ int main(int argc, char *argv[])
     TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",true,"","string");
     TCLAP::ValueArg<std::string> unitArg("U","units","New unit for the dataset",false,"Not set","string");
     TCLAP::ValueArg<std::string> metaArg("m","metadata","File containing metadata",false,"None","string");
+    TCLAP::ValueArg<std::string> noneArg("n","nonedata","None data value. Default -999",false,"-999","string");
 
     //Switches
     TCLAP::SwitchArg overwriteSwitch("o","overwrite","Overwrite dataset if exists", cmd, false);
@@ -158,6 +159,7 @@ int main(int argc, char *argv[])
     cmd.add(passArg);
     cmd.add(unitArg);
     cmd.add(metaArg);
+    cmd.add(noneArg);
 
     //Parsing the command lines
     cmd.parse( argc, argv );
@@ -173,6 +175,8 @@ int main(int argc, char *argv[])
     QString tableDesc = QString::fromUtf8(datasetDescArg.getValue().c_str());
     QString unit = QString::fromUtf8(unitArg.getValue().c_str());
     QString meta = QString::fromUtf8(metaArg.getValue().c_str());
+    QString noneValue = QString::fromUtf8(noneArg.getValue().c_str());
+
     bool replace = overwriteSwitch.getValue();
 
 
@@ -266,8 +270,6 @@ int main(int argc, char *argv[])
         QTime procTime;
         procTime.start();
 
-
-
         gridToCSV grdtoCSV;
         uploadCSV uploadData;
         uploadData.setTableName(tableName);
@@ -276,8 +278,10 @@ int main(int argc, char *argv[])
         uploadData.setPort(port.toInt());
         uploadData.setUser(userName);
         uploadData.setPassword(password);
+        uploadData.setNonDataValue(noneValue.toDouble());
 
         grdtoCSV.setGridFile(gridFile);
+        grdtoCSV.setNonDataValue(noneValue.toDouble());
         grdtoCSV.start();
         uploadData.start();
         grdtoCSV.wait();
