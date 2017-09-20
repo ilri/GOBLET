@@ -979,9 +979,13 @@ int main(int argc, char *argv[])
 
         if (qry.exec(mainsql))
         {
-            qry.first();
+            QString resultValue;
+            resultValue = "Null";
+            if (qry.first())
+                resultValue = qry.value(0).toString();
+
             if (format == "h")
-                gbtLog("Result: " + qry.value(0).toString());
+                gbtLog("Result: " + resultValue);
             else
             {
                 QDomDocument doc;
@@ -994,7 +998,7 @@ int main(int argc, char *argv[])
                 QDomElement resultde;
                 resultde = doc.createElement("result");
                 QDomText varValue;
-                varValue = doc.createTextNode(qry.value(0).toString());
+                varValue = doc.createTextNode(resultValue);
                 resultde.appendChild(varValue);
                 root.appendChild(resultde);
 
