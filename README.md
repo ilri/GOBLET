@@ -25,11 +25,11 @@ Creates a new GOBLET database.
 Create a new GOBLET database called “my1kmdb” in the directory ./mygobletdbs **(The directory must exist)** with a cell size of 0.00833333 (roughly 1km cell size).
   ```sh
    $ goblet-createdb -a ./mygobletdbs -d my1kmdb -c 0.008333333
-```
+  ```
 Create a new GOBLET database called “my1kmdb” in a remote server with a cell size of 0.00833333 (roughly 1km cell size).
   ```sh
    $ goblet-createdb -r -H MyRemoteServer -u myUserAccount -p MyPassword -d my1kmdb -c 0.008333333
-```
+  ```
 
 ---
 ### GOBLET-ImportDataset
@@ -81,7 +81,7 @@ Imports a shape file as a GOBLET shape dataset. The shape file will be rasterize
 Import  the shape file called kentanuga.shp into a dataset called "kentanuga" with description "Kenya, Tanzania and Uganda".
   ```sh
    $ goblet-importshape -a ./mygobletdbs -d my1kmdb -S ./kentanuga.shp -t kentanuga -s 'Kenya, Tanzania and Uganda'
-```
+  ```
 Import  the shape file called kenya_provinces.shp into a dataset called "kenprov" with description "Kenya Provinces".
 ```sh
    $ goblet-importshape -a ./mygobletdbs -d my1kmdb -S ./kenya_provinces.shp -t kenprov -s 'Kenya Provinces'
@@ -116,7 +116,7 @@ In the image below an extent represents a box covering from the blue point **(Up
 Output the grid dataset called “lgp” into an ASCII grid called “lgpout.asc” for an extent covering Kenya.
   ```sh
    $ goblet-outputraster -a ./mygobletdbs -d my1kmdb -t lgp -i g -e '(33.76,4.87) (42.07,-4.99)' -o ./lgpout.asc
-```
+  ```
 Output the grid dataset called “lgp” into an ASCII grid called “lgpout.asc” constraining the result into the shape of Kenya.
 ```sh
  $ goblet-outputraster -a ./mygobletdbs -d my1kmdb -t lgp -i g -S 'kentanuga:0' -o ./lgpout.asc
@@ -144,7 +144,7 @@ Generates a shape file from a GOBLET shape dataset. The tool can output the resu
 Output the shape dataset called "kentanuga" into a shape file called "testout.shp".
   ```sh
    $ goblet-outputshape -a ./mygobletdbs -d my1kmdb -s kentanuga -i s -o ./testout.shp
-```
+  ```
 
 ---
 ### GOBLET-AggregateDataset
@@ -167,15 +167,15 @@ Aggregates the data of a grid dataset into a shape dataset using aggregation fun
 Aggregate the grid "lgp" using an average function into the shape of "kenprov"
   ```sh
    $ goblet-aggregatedataset -a ./mygobletdbs -d my1kmdb -t lgp -s kenprov -f avg
-```
+  ```
 Aggregate the grid "popdens" using an average function into the shape of "kenprov"
   ```sh
    $ goblet-aggregatedataset -a ./mygobletdbs -d my1kmdb -t popdens -s kenprov -f avg
-```
+  ```
 Aggregate the grid "traveltime" using an average function into the shape of "kenprov"
   ```sh
    $ goblet-aggregatedataset -a ./mygobletdbs -d my1kmdb -t traveltime -s kenprov -f avg
-```
+  ```
 
 ---
 ### GOBLET-ClassifyDataset
@@ -492,7 +492,6 @@ Calculate 2 X traveltime and store the result into the file "output.asc"
    $ goblet-datasetcalc -a ./mygobletdbs -d my1kmdb -c 'traveltime * 2' -o f -g ./output.asc
 ```
 
-
 ---
 ### GOBLET-CalcInCombination
 Calculate operations in grid datasets aggregated by combination codes (Requires an existing combination). See *GOBLET-CombineDatasets*. The output can be easily readable for humans or represented in XML for its usage by other computer programs. The human readable output looks like this:
@@ -607,7 +606,6 @@ GOBLET was built using:
 - [Qt](https://www.qt.io/), a cross-platform application framework.
 - [MySQL](http://www.mysql.com/), an open-source relational database management system.
 - [TClap](http://tclap.sourceforge.net/), a small, flexible library that provides a simple interface for defining and accessing command line arguments. *(Included in source code)*
-- [QuaZIP](http://quazip.sourceforge.net/),  a simple C++ wrapper over Gilles Vollant's ZIP/UNZIP package that can be used to access ZIP archives.
 - [Shapefile](http://shapelib.maptools.org/), a C Library provides the ability to write simple C programs for reading, writing and updating (to a limited extent) ESRI Shapefiles, and the associated attribute file (.dbf).
 - [CMake] (http://www.cmake.org/), a cross-platform free and open-source software for managing the build process of software using a compiler-independent method.
 
