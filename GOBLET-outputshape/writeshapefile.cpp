@@ -559,7 +559,7 @@ bool writeShapefile::createShapeFile()
             output[i] = new char[strlen(cadena.at(i).toStdString().c_str())+1];
             memcpy(output[i], cadena.at(i).toStdString().c_str(), strlen(cadena.at(i).toStdString().c_str())+1);
         }
-        output[cadena.size()] = ((char)NULL);
+        output[cadena.size()] = ((char*)NULL);
         //Get the number of parameters
         nparams = cadena.count();
 
