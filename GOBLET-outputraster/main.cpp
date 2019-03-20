@@ -12,6 +12,7 @@
 #include <cmath>
 #include <QTextStream>
 #include <QVector>
+#include <QDebug>
 
 void gbtLog(QString message)
 {
@@ -271,8 +272,6 @@ QString getWhereClauseFromExtent(QString extent,QSqlDatabase db, QString table, 
         upperLeft.setX(round( ( dupperLeft.x() - xllCenter )/dbCellSize ));
         upperLeft.setY(NumberRows - round( ( dupperLeft.y() - yllCenter )/dbCellSize ) - 1);
 
-
-
         UL = dupperLeft;
 
         lowerRight.setX(round( ( dlowerRight.x() - xllCenter )/dbCellSize ));
@@ -366,7 +365,7 @@ void calcBoundFromShapes(QString shapeConstraint,QSqlDatabase db, QPointF &UL, Q
 
     if (hasShapes)
     {
-        sql = "SELECT shapeid,AsText(max(envelope(ogc_geom))) as boundbox FROM " + dataset + " WHERE ";
+        sql = "SELECT shapeid,AsText(envelope(ogc_geom)) as boundbox FROM " + dataset + " WHERE ";
         QString shapes = shapeConstraint.mid(pos+1,shapeConstraint.length()-pos+1);
         QString shape;
 
@@ -387,30 +386,20 @@ void calcBoundFromShapes(QString shapeConstraint,QSqlDatabase db, QPointF &UL, Q
             }
         }
         sql = sql + "shapeid = " + shape;
-        sql = sql + " GROUP BY shapeid";
     }
     else
     {
-        sql = "SELECT shapeid,AsText(max(envelope(ogc_geom))) as boundbox FROM " + dataset + " GROUP BY shapeid ";
+        sql = "SELECT shapeid,AsText(envelope(ogc_geom)) as boundbox FROM " + dataset;
     }
-
-    double maxX;
-    double maxY;
-    double minX;
-    double minY;
-
-    maxX = -3000;
-    maxY = -3000;
-    minX = 3000;
-    minY = 3000;
 
 
     QString cadena;
-    QString geopos;
-
-    double temp;
+    //qDebug() << sql;
     if (qry.exec(sql))
     {
+        //Given the shapes creates a MultiPolygon with each bounding box to get the maximum extent of the shapes
+        sql = "select AsText(envelope(GeomFromText('MultiPolygon((";
+        QStringList polygons;
         while (qry.next())
         {
             cadena = qry.value(1).toString();
@@ -418,61 +407,32 @@ void calcBoundFromShapes(QString shapeConstraint,QSqlDatabase db, QPointF &UL, Q
             cadena = cadena.mid(pos+1,cadena.length()-pos+1); //Remove the type of shape
             cadena = cadena.replace("(","");
             cadena = cadena.replace(")","");
-            pos = 0;
-            while (pos <= cadena.length()-1)
+            polygons.append("(" + cadena + ")");
+        }
+        sql = sql + polygons.join(",");
+        sql = sql + "))')))";
+        if (qry.exec(sql))
+        {
+            if (qry.first())
             {
-                if (cadena[pos] != ',')
-                {
-                    geopos = geopos + cadena[pos];
-                    pos++;
-                }
-                else
-                {
-                    cadena = cadena.mid(pos+1,cadena.length()-pos+1);
+                cadena = qry.value(0).toString();
+                QStringList parts = cadena.split(",",QString::SkipEmptyParts);
+                QString SUL = parts[3];
+                QString SLR = parts[1];
 
-                    pos = geopos.indexOf(" ");
-                    temp = geopos.left(pos).toDouble();
-                    if (temp > maxX)
-                        maxX = temp;
-                    if (temp < minX)
-                        minX = temp;
+                double ULX = SUL.split(" ")[0].toDouble();
+                double ULY = SUL.split(" ")[1].toDouble();
 
-                    temp = geopos.mid(pos+1,geopos.length()-pos+1).toDouble();
+                double LRX = SLR.split(" ")[0].toDouble();
+                double LRY = SLR.split(" ")[1].toDouble();
 
-                    if (temp > maxY)
-                        maxY = temp;
-                    if (temp < minY)
-                        minY = temp;
+                UL.setX(ULX);
+                UL.setY(ULY);
 
-                    pos = 0;
-                    geopos = "";
-                }
+                LR.setX(LRX);
+                LR.setY(LRY);
             }
-
-            //Final string
-            pos = geopos.indexOf(" ");
-            temp = geopos.left(pos).toDouble();
-            if (temp > maxX)
-                maxX = temp;
-            if (temp < minX)
-                minX = temp;
-
-            temp = geopos.mid(pos+1,geopos.length()-pos+1).toDouble();
-
-            if (temp > maxY)
-                maxY = temp;
-            if (temp < minY)
-                minY = temp;
-
-        }        
-        UL.setX(minX);
-        UL.setY(maxY);
-
-        LR.setX(maxX);
-        LR.setY(minY);
-
-
-
+        }
     }
     else
         return;
@@ -673,7 +633,7 @@ int main(int argc, char *argv[])
     TCLAP::ValueArg<std::string> portArg("P","port","Port number to use. Default 3306",false,"3306","string");
     TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",true,"","string");
     TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",true,"","string");
-    TCLAP::ValueArg<std::string> extentArg("e","extent","Extent: '(upperLeft degrees lat,log) (lowerRight degrees lat,log)'",false,"","string");
+    TCLAP::ValueArg<std::string> extentArg("e","extent","Extent: '(upperLeft degrees log,lat) (lowerRight degrees log,lat)'",false,"","string");
     TCLAP::ValueArg<std::string> shpConstraintArg("S","constraintbyshapes","Constraint output using a shapefile and shapes: ShapeDataSet:shapeID,ShapeID,....",false,"","string");
     TCLAP::ValueArg<std::string> classesArg("c","combinationtoshow","Combination/classification to show: 'Combination/Class Code,Combination/Class Code,....'",false,"","string");
 
@@ -991,6 +951,8 @@ int main(int argc, char *argv[])
 
         if (qry.exec(sql))
         {
+            int cells;
+            cells = 1;
             gbtLog(QObject::tr("Rasterizing"));
             while (qry.next())
             {
@@ -1002,7 +964,14 @@ int main(int argc, char *argv[])
                     if (((y-bottom-1) >= 0) && ((y-bottom-1) <= (nrows -1)))
                         grid[y-bottom-1][x-left-1] = qry.value(2).toFloat();
                 }
+                cells++;
             }
+            //qDebug() << upperLeft;
+            //qDebug() << lowerRight;
+            //qDebug() << "------------------";
+            //gbtLog(QString::number(left) + QObject::tr(" = left"));
+            //gbtLog(QString::number(bottom) + QObject::tr(" = bottom"));
+            //gbtLog(QString::number(cells) + QObject::tr(" cells rasterized"));
             QFile file(outputFile);
             if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
                 return -1;
