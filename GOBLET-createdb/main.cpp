@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
         sql = "SELECT count(*) from " + dbName + ".testupload";
         if (!qry.exec(sql))
         {
-            gbtLog(QObject::tr("Cannot upload test data: ") + qry.lastError().databaseText());
+            gbtLog(QObject::tr("Cannot select test data: ") + qry.lastError().databaseText());
             mydb.close();
             return 1;
         }
