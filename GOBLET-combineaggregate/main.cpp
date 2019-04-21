@@ -195,7 +195,16 @@ int main(int argc, char *argv[])
 
             return 1;
         }
-
+        QStringList grids;
+        sql = "SELECT DISTINCT griddataset FROM aggrtable WHERE shapedataset = '" + tableName + "'";
+        if (qry.exec(sql))
+        {
+            while (qry.next())
+            {
+                grids.append(qry.value(0).toString());
+            }
+        }
+        //qDebug() << grids;
 
         sql = "INSERT INTO combaggregate (shapedataset,shapeid,comCode) SELECT TA.shapedataset,TA.shapeid,";
         if (function == "sum")
@@ -208,6 +217,11 @@ int main(int argc, char *argv[])
             sql = sql + "BIT_XOR(TA.classCode)";
         sql = sql + " FROM aggrtable TA, " + tableName + " TB";
         sql = sql + " WHERE TA.shapeid = TB.shapeid AND TA.shapedataset = '" + tableName + "'";
+        for (int grd = 0; grd < grids.count(); grd++)
+        {
+            sql = sql + " AND TA.shapeid IN (SELECT DISTINCT shapeid FROM aggrtable WHERE classCode IS NOT NULL AND griddataset = '" + grids[grd] + "' AND shapedataset = '" + tableName + "')";
+        }
+
 
         QString WhereClause;
         if (!extent.isEmpty())
@@ -219,7 +233,7 @@ int main(int argc, char *argv[])
 
         sql = sql + " GROUP BY TA.shapedataset,TA.shapeid";
 
-
+        //qDebug() << sql;
 
         gbtLog(QObject::tr("Combining aggregate."));
 
