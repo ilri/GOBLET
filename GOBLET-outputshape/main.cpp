@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
                 return 1;
             }
 
-            sql = "SELECT TA.shapeid,TA.classCode,AsText(TB.ogc_geom) as shpgeometry";
+            sql = "SELECT TB.*,TA.shapeid,TA.classCode,AsText(TB.ogc_geom) as shpgeometry";
             sql = sql + " FROM aggrtable TA," + shapeName + " TB";
             sql = sql + " WHERE TA.shapedataset = '" + shapeName + "'";
             sql = sql + " AND TA.griddataset = '" + tableName + "'";
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
         }
         if (datasetType == "b")
         {
-            sql = "SELECT TA.shapeid,TA.comCode,AsText(TB.ogc_geom) as shpgeometry";
+            sql = "SELECT TB.*,TA.shapeid,TA.comCode,AsText(TB.ogc_geom) as shpgeometry";
             sql = sql + " FROM combaggregate TA," + shapeName + " TB";
             sql = sql + " WHERE TA.shapedataset = '" + shapeName + "'";
             sql = sql + " AND TA.shapeid = TB.shapeid";
