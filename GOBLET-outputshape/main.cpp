@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
     TCLAP::ValueArg<std::string> userArg("u","user","User. Default empty",true,"","string");
     TCLAP::ValueArg<std::string> passArg("p","password","Passwork. Default no password",true,"","string");
     TCLAP::ValueArg<std::string> extentArg("e","extent","Extent: '(upperLeft degrees lat,log) (lowerRight degrees lat,log)'",false,"","string");
+    TCLAP::ValueArg<std::string> shapesArg("S","shapes","Only certain shapes: 'shapeid,shapeid,shapeid,...'",false,"","string");
     TCLAP::ValueArg<std::string> datasetArg("t","dataset","Dataset name",false,"","string");
 
     TCLAP::ValueArg<std::string> classesArg("c","classestoshow","'classCode,classCode,....'",false,"","string");
@@ -152,6 +153,7 @@ int main(int argc, char *argv[])
     cmd.add(userArg);
     cmd.add(passArg);
     cmd.add(extentArg);
+    cmd.add(shapesArg);
     cmd.add(classesArg);
     cmd.add(combsArg);
 
@@ -170,10 +172,12 @@ int main(int argc, char *argv[])
     QString outputFile = QString::fromUtf8(outputArg.getValue().c_str());
     QString datasetType = QString::fromUtf8(datasetypeArg.getValue().c_str());
     QString extent = QString::fromUtf8(extentArg.getValue().c_str());
+    QString Sshapes = QString::fromUtf8(shapesArg.getValue().c_str());
     QString classestoShow = QString::fromUtf8(classesArg.getValue().c_str());
     QString combstoShow = QString::fromUtf8(combsArg.getValue().c_str());
 
-
+    QStringList Shapes;
+    Shapes = Sshapes.split(",",QString::SkipEmptyParts);
 
     QSqlDatabase mydb;
 
@@ -225,8 +229,7 @@ int main(int argc, char *argv[])
 
         QString WhereClause;
         if (!extent.isEmpty())
-            WhereClause = getWhereClauseFromExtent(extent);
-
+            WhereClause = getWhereClauseFromExtent(extent);        
         sql = "";
         if (datasetType == "s")
         {
@@ -252,7 +255,16 @@ int main(int argc, char *argv[])
 
             sql = sql + " FROM " + shapeName + " TB ";
             if (!WhereClause.isEmpty())
+            {
                 sql = sql + " WHERE " + WhereClause;
+                if (Shapes.count() > 0)
+                    sql = sql + " AND TB.shapeid IN (" + Shapes.join(",") + ")";
+            }
+            else
+            {
+                if (Shapes.count() > 0)
+                    sql = sql + " WHERE TB.shapeid IN (" + Shapes.join(",") + ")";
+            }
         }
         if (datasetType == "c")
         {
@@ -264,7 +276,7 @@ int main(int argc, char *argv[])
                 return 1;
             }
 
-            sql = "SELECT TA.shapeid,TA.classCode,AsText(TB.ogc_geom) as shpgeometry";
+            sql = "SELECT TB.*,TA.shapeid,TA.classCode,AsText(TB.ogc_geom) as shpgeometry";
             sql = sql + " FROM aggrtable TA," + shapeName + " TB";
             sql = sql + " WHERE TA.shapedataset = '" + shapeName + "'";
             sql = sql + " AND TA.griddataset = '" + tableName + "'";
@@ -275,10 +287,12 @@ int main(int argc, char *argv[])
             {
                 sql = sql + " AND (" + getClasses(classestoShow,"classCode") + ")";
             }
+            if (Shapes.count() > 0)
+                sql = sql + " AND TA.shapeid IN (" + Shapes.join(",") + ")";
         }
         if (datasetType == "b")
         {
-            sql = "SELECT TA.shapeid,TA.comCode,AsText(TB.ogc_geom) as shpgeometry";
+            sql = "SELECT TB.*,TA.shapeid,TA.comCode,AsText(TB.ogc_geom) as shpgeometry";
             sql = sql + " FROM combaggregate TA," + shapeName + " TB";
             sql = sql + " WHERE TA.shapedataset = '" + shapeName + "'";
             sql = sql + " AND TA.shapeid = TB.shapeid";
@@ -288,6 +302,8 @@ int main(int argc, char *argv[])
             {
                 sql = sql + " AND (" + getClasses(combstoShow,"comCode") + ")";
             }
+            if (Shapes.count() > 0)
+                sql = sql + " AND TA.shapeid IN (" + Shapes.join(",") + ")";
         }
 
         writeShapefile shapefile;

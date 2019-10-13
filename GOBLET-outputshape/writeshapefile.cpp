@@ -272,7 +272,7 @@ QStringList writeShapefile::getGeometry(QString mysqlGeo)
 
 bool writeShapefile::createShapeFile()
 {
-
+    setlocale(LC_ALL, "C");
     /*
 
       This function creates the shape file
