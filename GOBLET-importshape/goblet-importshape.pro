@@ -16,8 +16,8 @@ TEMPLATE = app
 
 #unix:QMAKE_POST_LINK=strip $(TARGET)
 
-unix:INCLUDEPATH += ../3rdParty /usr/include
-unix:LIBS += -L/usr/lib64 /usr/lib64/libshp.a
+unix:INCLUDEPATH += ../3rdParty
+unix:LIBS += -L/usr/lib64 /usr/lib/libshp.a
 
 SOURCES += main.cpp \
     insertshape.cpp \
