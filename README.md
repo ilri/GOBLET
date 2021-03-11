@@ -7,6 +7,10 @@ GOBLET does not display data (on screen maps). To display any raster or shape ou
 
 GOBLET only imports/exports ArcInfo ASCII grids and shapefiles. If you need to use any other raster format like GeoTIFF, you can use [GDAL](http://www.gdal.org/gdal_translate.html) to convert raster files across different formats.
 
+If you use GOBLET please cite:
+
+*Quiros, C. 2019. GOBLET. A technology for processing large scale spatial datasets using relational databases. Source Code. Nairobi: ILRI. https://hdl.handle.net/10568/112935.*
+
 ## The toolbox
 
 ### GOBLET-CreateDB
