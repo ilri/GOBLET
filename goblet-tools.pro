@@ -25,7 +25,8 @@ GOBLET-createdb/goblet-createdb.pro \
     GOBLET-executesql/goblet-executesql.pro \
     GOBLET-aggregatetoshape/goblet-aggregatetoshape.pro \
     GOBLET-calcinshape/goblet-calcinshape.pro \
-    GOBLET-extractmetadata/goblet-extractmetadata.pro
+    GOBLET-extractmetadata/goblet-extractmetadata.pro \
+    GOBLET-datasetextract/goblet-datasetextract.pro
 
 
 

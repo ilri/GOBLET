@@ -84,6 +84,7 @@ void uploadCSV::run()
         mydb = QSqlDatabase::addDatabase("QMYSQL","connection2");
         mydb.setHostName(m_host);
         mydb.setPort(m_port);
+        mydb.setConnectOptions("MYSQL_OPT_LOCAL_INFILE=1");
         if (!m_user.isEmpty())
            mydb.setUserName(m_user);
         if (!m_password.isEmpty())
