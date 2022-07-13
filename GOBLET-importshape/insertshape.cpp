@@ -373,8 +373,8 @@ int insertShape::ring_check(SHPObject* obj, char *, char *sr_id, int rings,DBFHa
     Insert_attributes(hDBFHandle,rings-1);
 
 
-    //printf(",GeometryFromText('MULTIPOLYGON(");
-    appendString(",GeometryFromText('MULTIPOLYGON(");
+    //printf(",ST_GeomFromText('MULTIPOLYGON(");
+    appendString(",ST_GeomFromText('MULTIPOLYGON(");
 
 
     for(u=0; u < out_index; u++)
@@ -452,8 +452,8 @@ int insertShape::ring_check(SHPObject* obj, char *, char *sr_id, int rings,DBFHa
 
 
     //printf(")',%s) );",sr_id);
-
-    appendString(")'," + QString::fromUtf8(sr_id) + ") );");
+    //qDebug() << "ring_check:" << QString::fromUtf8(sr_id);
+    appendString(")') );");
 
 
     for(u=0; u < out_index; u++)
@@ -766,8 +766,8 @@ int insertShape::loadShape()
 
                 Insert_attributes(hDBFHandle,j); //add the attributes for each entity to the insert statement
 
-                //printf(",GeometryFromText('POINT (");
-                appendString(",GeometryFromText('POINT (");
+                //printf(",ST_GeomFromText('POINT (");
+                appendString(",ST_GeomFromText('POINT (");
 
                 obj = SHPReadObject(hSHPHandle,j);
 
@@ -785,8 +785,8 @@ int insertShape::loadShape()
                     }
                 }
 
-                //printf(")',%s) );\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + ") );\n");
+                //qDebug() << "points:" << QString::fromUtf8(sr_id);
+                appendString(")') );\n");
 
                 SHPDestroyObject(obj);
             }
@@ -826,8 +826,8 @@ int insertShape::loadShape()
 
 
 
-                //printf(",GeometryFromText('MULTILINESTRING (");
-                appendString(",GeometryFromText('MULTILINESTRING (");
+                //printf(",ST_GeomFromText('MULTILINESTRING (");
+                appendString(",ST_GeomFromText('MULTILINESTRING (");
 
 
                 //for each vertice write out the coordinates in the insert statement, when there is a new line
@@ -880,8 +880,8 @@ int insertShape::loadShape()
                         }
                     }
                 }
-                //printf(")',%s) );\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + ") );\n");
+                //qDebug() << "arc lines:" << QString::fromUtf8(sr_id);
+                appendString(")') );\n");
                 SHPDestroyObject(obj);
             }
 
@@ -910,8 +910,8 @@ int insertShape::loadShape()
 
                 Insert_attributes(hDBFHandle,j); //add the attributes for each entity to the insert statement
 
-                //printf(",GeometryFromText('MULTIPOINT (");
-                appendString(",GeometryFromText('MULTIPOINT (");
+                //printf(",ST_GeomFromText('MULTIPOINT (");
+                appendString(",ST_GeomFromText('MULTIPOINT (");
 
                 obj = SHPReadObject(hSHPHandle,j);
 
@@ -929,8 +929,8 @@ int insertShape::loadShape()
                     }
                 }
 
-                //printf(")',%s) );\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + ") );\n");
+                //qDebug() << "multipoints:" << QString::fromUtf8(sr_id);
+                appendString(")') );\n");
 
                 SHPDestroyObject(obj);
 
@@ -960,8 +960,8 @@ int insertShape::loadShape()
 
                 Insert_attributes(hDBFHandle,j); //add the attributes for each entity to the insert statement
 
-                //printf(",GeometryFromText('POINT (");
-                appendString(",GeometryFromText('POINT (");
+                //printf(",ST_GeomFromText('POINT (");
+                appendString(",ST_GeomFromText('POINT (");
 
                 obj = SHPReadObject(hSHPHandle,j);
 
@@ -979,8 +979,8 @@ int insertShape::loadShape()
                     }
                 }
 
-                //printf(")',%s) );\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + ") );\n");
+                //qDebug() << "point Z:" << QString::fromUtf8(sr_id);
+                appendString(")') );\n");
 
                 SHPDestroyObject(obj);
             }
@@ -1020,8 +1020,8 @@ int insertShape::loadShape()
                 Insert_attributes(hDBFHandle,j);//add the attributes of each shape to the insert statement
 
 
-                //printf(",GeometryFromText('MULTILINESTRING (");
-                appendString(",GeometryFromText('MULTILINESTRING (");
+                //printf(",ST_GeomFromText('MULTILINESTRING (");
+                appendString(",ST_GeomFromText('MULTILINESTRING (");
 
 
                 //for each vertice write out the coordinates in the insert statement, when there is a new line
@@ -1056,8 +1056,8 @@ int insertShape::loadShape()
                     }
                 }
 
-                //printf(")',%s));\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + "));\n");
+                //qDebug() << "line Z:" << QString::fromUtf8(sr_id);
+                appendString(")'));\n");
 
                 SHPDestroyObject(obj);
             }
@@ -1117,8 +1117,8 @@ int insertShape::loadShape()
                 Insert_attributes(hDBFHandle,j);//add the attributes of each shape to the insert statement
 
 
-                //printf(",GeometryFromText('MULTIPOINT (");
-                appendString(",GeometryFromText('MULTIPOINT (");
+                //printf(",ST_GeomFromText('MULTIPOINT (");
+                appendString(",ST_GeomFromText('MULTIPOINT (");
 
 
                 for (u=0;u<obj->nVertices; u++)
@@ -1135,8 +1135,8 @@ int insertShape::loadShape()
                     }
                 }
 
-                //printf(")',%s));\n",sr_id);
-                appendString(")'," + QString::fromUtf8(sr_id) + "));\n");
+                //qDebug() << "Multipoint Z:" << QString::fromUtf8(sr_id);
+                appendString(")'));\n");
 
                 SHPDestroyObject(obj);
             }

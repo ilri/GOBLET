@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
     mydb = QSqlDatabase::addDatabase("QMYSQL","connection1");
     mydb.setHostName(host);
     mydb.setPort(port.toInt());
+    mydb.setConnectOptions("MYSQL_OPT_LOCAL_INFILE=1");
     if (!userName.isEmpty())
         mydb.setUserName(userName);
     if (!password.isEmpty())

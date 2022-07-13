@@ -1,0 +1,34 @@
+--- a/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
++++ b/src/plugins/sqldrivers/mysql/qsql_mysql.cpp
+@@ -1251,6 +1251,9 @@ bool QMYSQLDriver::open(const QString& db,
+     uint connectTimeout = 0;
+     uint readTimeout = 0;
+     uint writeTimeout = 0;
++#if MYSQL_VERSION_ID >= 50711
++    uint localInfile = 0;
++#endif
+
+     // extract the real options from the string
+     for (int i = 0; i < opts.count(); ++i) {
+@@ -1280,6 +1283,10 @@ bool QMYSQLDriver::open(const QString& db,
+                 sslCAPath = val;
+             else if (opt == QLatin1String("SSL_CIPHER"))
+                 sslCipher = val;
++#if MYSQL_VERSION_ID >= 50711
++            else if (opt == QLatin1String("MYSQL_OPT_LOCAL_INFILE"))
++                localInfile = val.toInt();
++#endif
+             else if (val == QLatin1String("TRUE") || val == QLatin1String("1"))
+                 setOptionFlag(optionFlags, tmp.left(idx).simplified());
+             else
+@@ -1319,6 +1326,10 @@ bool QMYSQLDriver::open(const QString& db,
+         mysql_options(d->mysql, MYSQL_OPT_READ_TIMEOUT, &readTimeout);
+     if (writeTimeout != 0)
+         mysql_options(d->mysql, MYSQL_OPT_WRITE_TIMEOUT, &writeTimeout);
++#endif
++#if MYSQL_VERSION_ID >= 50711
++    if (localInfile != 0)
++        mysql_options(d->mysql, MYSQL_OPT_LOCAL_INFILE, &localInfile);
+ #endif
+     MYSQL *mysql = mysql_real_connect(d->mysql,
+                                       host.isNull() ? static_cast<const char *>(0)
